@@ -21,7 +21,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: arm32v7DebianBundle
-          path: debian-platforms/build/tmp/buildArm32v7DebianBundle/bundle/postgres-linux-arm_32.txz
+          path: debian-platforms/build/tmp/buildArm32v7DebianBundle/bundle/postgres-linux-debian.txz
   debian-arm64v8:
     name: Debian - arm64v8
     runs-on: ubuntu-latest
@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: arm64v8DebianBundle
-          path: debian-platforms/build/tmp/buildArm64v8DebianBundle/bundle/postgres-linux-arm_64.txz
+          path: debian-platforms/build/tmp/buildArm64v8DebianBundle/bundle/postgres-linux-debian.txz
   debian-ppc64le:
     name: Debian - ppc64le
     runs-on: ubuntu-latest
@@ -63,7 +63,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ppc64leDebianBundle
-          path: debian-platforms/build/tmp/buildPpc64leDebianBundle/bundle/postgres-linux-ppcle_64.txz
+          path: debian-platforms/build/tmp/buildPpc64leDebianBundle/bundle/postgres-linux-debian.txz
   alpine-arm32v6:
     name: Alpine Linux - arm32v6
     runs-on: ubuntu-latest
@@ -84,7 +84,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: arm32v6AlpineBundle
-          path: alpine-platforms/build/tmp/buildArm32v6AlpineBundle/bundle/postgres-linux-arm_32.txz
+          path: alpine-platforms/build/tmp/buildArm32v6AlpineBundle/bundle/postgres-linux-alpine_linux.txz
   alpine-arm64v8:
     name: Alpine Linux - arm64v8
     runs-on: ubuntu-latest
@@ -105,7 +105,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: arm64v8AlpineBundle
-          path: alpine-platforms/build/tmp/buildArm64v8AlpineBundle/bundle/postgres-linux-arm_64.txz
+          path: alpine-platforms/build/tmp/buildArm64v8AlpineBundle/bundle/postgres-linux-alpine_linux.txz
   alpine-ppc64le:
     name: Alpine Linux - ppc64le
     runs-on: ubuntu-latest
@@ -126,7 +126,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ppc64leAlpineBundle
-          path: alpine-platforms/build/tmp/buildPpc64leAlpineBundle/bundle/postgres-linux-ppcle_64.txz
+          path: alpine-platforms/build/tmp/buildPpc64leAlpineBundle/bundle/postgres-linux-alpine_linux.txz
   alpine-lite-arm32v6:
     name: Alpine Linux - arm32v6 - lite
     runs-on: ubuntu-latest
@@ -147,7 +147,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: arm32v6AlpineLiteBundle
-          path: alpine-lite-platforms/build/tmp/buildArm32v6AlpineLiteBundle/bundle/postgres-linux-arm_32.txz
+          path: alpine-lite-platforms/build/tmp/buildArm32v6AlpineLiteBundle/bundle/postgres-linux-alpine_linux.txz
   alpine-lite-arm64v8:
     name: Alpine Linux - arm64v8 - lite
     runs-on: ubuntu-latest
@@ -168,7 +168,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: arm64v8AlpineLiteBundle
-          path: alpine-lite-platforms/build/tmp/buildArm64v8AlpineLiteBundle/bundle/postgres-linux-arm_64.txz
+          path: alpine-lite-platforms/build/tmp/buildArm64v8AlpineLiteBundle/bundle/postgres-linux-alpine_linux.txz
   alpine-lite-ppc64le:
     name: Alpine Linux - ppc64le - lite
     runs-on: ubuntu-latest
@@ -189,7 +189,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ppc64leAlpineLiteBundle
-          path: alpine-lite-platforms/build/tmp/buildPpc64leAlpineLiteBundle/bundle/postgres-linux-ppcle_64.txz
+          path: alpine-lite-platforms/build/tmp/buildPpc64leAlpineLiteBundle/bundle/postgres-linux-alpine_linux.txz
   release:
     name: Collect & Release
     needs: [debian-arm32v7, debian-arm64v8, debian-ppc64le, alpine-arm32v6, alpine-arm64v8, alpine-ppc64le, alpine-lite-arm32v6, alpine-lite-arm64v8, alpine-lite-ppc64le]
