@@ -1,0 +1,43 @@
+name: Release
+on: [ push, pull_request ]
+jobs:
+  build:
+    name: buildAmd64LinuxBundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: master
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 10
+      - name: Build AMD64 Linux Bundle
+        run: ./gradlew :repacked-platforms:buildAmd64LinuxBundle -Pversion=9.6.24 -PpgVersion=9.6.24
+      - name: Upload bundle
+        uses: actions/upload-artifact@v2
+        with:
+          name: buildAmd64LinuxBundle
+          path: repacked-platforms/build/tmp/buildAmd64LinuxBundle/bundle/postgres-linux-x86_64.txz
+  test:
+    name: testAmd64LinuxBundle
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: master
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 10
+      - name: Download bundle
+        uses: actions/download-artifact@v2
+        with:
+          name: buildAmd64LinuxBundle
+          path: repacked-platforms/build/tmp/buildAmd64LinuxBundle/bundle
+      - run: ls -alh /home/runner/work/embedded-postgres-binaries/embedded-postgres-binaries/repacked-platforms/build/tmp/buildAmd64LinuxBundle/bundle
+      - name: Test AMD64 Linux Bundle
+        run: ./gradlew :repacked-platforms:testAmd64LinuxJar --info -x buildAmd64LinuxBundle -Pversion=9.6.24 -PpgVersion=9.6.24
