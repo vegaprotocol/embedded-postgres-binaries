@@ -16,7 +16,7 @@ jobs:
       - name: Register QEMU executables
         run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
       - name: Build Bundle
-        run: ./gradlew :debian-platforms:buildArm32v7DebianBundle -Pversion=9.6.24 -PpgVersion=9.6.24
+        run: ./gradlew :debian-platforms:buildArm32v7DebianBundle -Pversion=14.1.0 -PpgVersion=14.1
       - name: Upload bundle
         uses: actions/upload-artifact@v2
         with:
@@ -37,7 +37,7 @@ jobs:
       - name: Register QEMU executables
         run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
       - name: Build Bundle
-        run: ./gradlew :debian-platforms:buildArm64v8DebianBundle -Pversion=9.6.24 -PpgVersion=9.6.24
+        run: ./gradlew :debian-platforms:buildArm64v8DebianBundle -Pversion=14.1.0 -PpgVersion=14.1
       - name: Upload bundle
         uses: actions/upload-artifact@v2
         with:
@@ -58,7 +58,7 @@ jobs:
       - name: Register QEMU executables
         run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
       - name: Build Bundle
-        run: ./gradlew :debian-platforms:buildPpc64leDebianBundle -Pversion=9.6.24 -PpgVersion=9.6.24
+        run: ./gradlew :debian-platforms:buildPpc64leDebianBundle -Pversion=14.1.0 -PpgVersion=14.1
       - name: Upload bundle
         uses: actions/upload-artifact@v2
         with:
@@ -79,7 +79,7 @@ jobs:
       - name: Register QEMU executables
         run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
       - name: Build Bundle
-        run: ./gradlew :alpine-platforms:buildArm32v6AlpineBundle -Pversion=9.6.24 -PpgVersion=9.6.24
+        run: ./gradlew :alpine-platforms:buildArm32v6AlpineBundle -Pversion=14.1.0 -PpgVersion=14.1
       - name: Upload bundle
         uses: actions/upload-artifact@v2
         with:
@@ -100,7 +100,7 @@ jobs:
       - name: Register QEMU executables
         run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
       - name: Build Bundle
-        run: ./gradlew :alpine-platforms:buildArm64v8AlpineBundle -Pversion=9.6.24 -PpgVersion=9.6.24
+        run: ./gradlew :alpine-platforms:buildArm64v8AlpineBundle -Pversion=14.1.0 -PpgVersion=14.1
       - name: Upload bundle
         uses: actions/upload-artifact@v2
         with:
@@ -121,7 +121,7 @@ jobs:
       - name: Register QEMU executables
         run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
       - name: Build Bundle
-        run: ./gradlew :alpine-platforms:buildPpc64leAlpineBundle -Pversion=9.6.24 -PpgVersion=9.6.24
+        run: ./gradlew :alpine-platforms:buildPpc64leAlpineBundle -Pversion=14.1.0 -PpgVersion=14.1
       - name: Upload bundle
         uses: actions/upload-artifact@v2
         with:
@@ -142,7 +142,7 @@ jobs:
       - name: Register QEMU executables
         run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
       - name: Build Bundle
-        run: ./gradlew :alpine-lite-platforms:buildArm32v6AlpineLiteBundle -Pversion=9.6.24 -PpgVersion=9.6.24
+        run: ./gradlew :alpine-lite-platforms:buildArm32v6AlpineLiteBundle -Pversion=14.1.0 -PpgVersion=14.1
       - name: Upload bundle
         uses: actions/upload-artifact@v2
         with:
@@ -163,7 +163,7 @@ jobs:
       - name: Register QEMU executables
         run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
       - name: Build Bundle
-        run: ./gradlew :alpine-lite-platforms:buildArm64v8AlpineLiteBundle -Pversion=9.6.24 -PpgVersion=9.6.24
+        run: ./gradlew :alpine-lite-platforms:buildArm64v8AlpineLiteBundle -Pversion=14.1.0 -PpgVersion=14.1
       - name: Upload bundle
         uses: actions/upload-artifact@v2
         with:
@@ -184,7 +184,7 @@ jobs:
       - name: Register QEMU executables
         run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
       - name: Build Bundle
-        run: ./gradlew :alpine-lite-platforms:buildPpc64leAlpineLiteBundle -Pversion=9.6.24 -PpgVersion=9.6.24
+        run: ./gradlew :alpine-lite-platforms:buildPpc64leAlpineLiteBundle -Pversion=14.1.0 -PpgVersion=14.1
       - name: Upload bundle
         uses: actions/upload-artifact@v2
         with:
@@ -254,8 +254,8 @@ jobs:
           path: alpine-lite-platforms/build/tmp/buildPpc64leAlpineLiteBundle/bundle
       - name: Release with Gradle
         env:
-          POSTGRES_VERSION: 9.6.24
-          RELEASE_VERSION: 9.6.24
+          POSTGRES_VERSION: 14.1
+          RELEASE_VERSION: 14.1.0
           MAVEN_USER: ${{ secrets.MAVEN_USER }}
           MAVEN_PASS: ${{ secrets.MAVEN_PASS }}
           SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
