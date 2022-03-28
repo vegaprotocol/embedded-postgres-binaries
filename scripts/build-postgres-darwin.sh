@@ -8,7 +8,7 @@
 # the .zip file for manual upload to github releases.
 
 PG_VERSION=14.1
-TIMESCALE_VERSION=2.5.1
+TIMESCALE_VERSION=2.6.0
 
 ARCH=$(uname -m)
 if [ "$ARCH" == "x86_64" ]; then
