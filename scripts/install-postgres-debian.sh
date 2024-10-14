@@ -76,6 +76,36 @@ cd ./build
 make
 make install
 
+## install toolkit
+# First, ensure rust is set up
+pgrx_flag="pg14"
+
+case "${PG_VERSION}" in
+  *12*)
+    pgrx_flag="pg12"
+    ;;
+  *13*)
+    pgrx_flag="pg13"
+    ;;
+  *14*)
+    pgrx_flag="pg14"
+    ;;
+  *15*)
+    pgrx_flag="pg15"
+    ;;
+  *16*)
+    pgrx_flag="pg16"
+    ;;
+esac
+
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+# cargo-pgrx is required
+cargo install --version '=0.10.2' --force cargo-pgrx
+# set up pgrx dev environment
+cargo pgrx init --$pgrx_flag pg_config
+git clone https://github.com/timescale/timescaledb-toolkit && cd timescaledb-toolkit/extension
+cargo pgrx install --release && cargo run --manifest-path ../tools/post-install/Cargo.toml -- pg_config
+
 cd /usr/local/pg-build
 cp /lib/*/libz.so.1 /lib/*/liblzma.so.5 /usr/lib/libossp-uuid.so.16 /usr/lib/*/libxml2.so.2 /usr/lib/*/libxslt.so.1 ./lib
 cp /lib/*/libssl.so.1.1 /lib/*/libcrypto.so.1.1 ./lib || cp /usr/lib/*/libssl.so.1.1 /usr/lib/*/libcrypto.so.1.1 ./lib
