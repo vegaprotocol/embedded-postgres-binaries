@@ -88,6 +88,16 @@ $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries
         chrpath \
         flex \
         bison \
+        curl \
+        git \
+        clang \
+        pkgconfig \
+        readline-dev \
+        libxml2-utils \
+        ccache \
+        zlib-dev \
+        libxslt-dev \
+        g++ \
         \
     && if [ "$E2FS_ENABLED" = false ]; then \
         wget -O uuid.tar.gz "https://www.mirrorservice.org/sites/ftp.ossp.org/pkg/lib/uuid/uuid-1.6.2.tar.gz" \
@@ -174,10 +184,13 @@ $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries
     ; fi \
     \
     && if [ "$WITH_TOOLKIT" = true ]; then \
-      && curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh \
+      curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+      && . "$HOME/.cargo/env" \
+      && export PATH="/usr/local/pg-build/bin:${PATH}" \
       && cargo install --version "=0.10.2" --force cargo-pgrx \
       && cargo pgrx init --$pgrx_flag pg_config \
       && git clone https://github.com/timescale/timescaledb-toolkit && cd timescaledb-toolkit/extension \
+      && git checkout 1.18.0 \
       && cargo pgrx install --release && cargo run --manifest-path ../tools/post-install/Cargo.toml -- pg_config \
     ; fi \
     \

@@ -88,7 +88,16 @@ $DOCKER_OPTS $IMG_NAME /bin/bash -ex -c 'echo "Starting building postgres binari
         tcl-dev \
         flex \
         bison \
-        \
+        curl \
+        git \
+        clang \
+        build-essential \
+        libreadline-dev \
+        zlib1g-dev \
+        libxml2-utils \
+        xsltproc \
+        ccache \
+       \
     && wget -O patchelf.tar.gz "https://nixos.org/releases/patchelf/patchelf-0.9/patchelf-0.9.tar.gz" \
     && mkdir -p /usr/src/patchelf \
     && tar -xf patchelf.tar.gz -C /usr/src/patchelf --strip-components 1 \
@@ -168,10 +177,13 @@ $DOCKER_OPTS $IMG_NAME /bin/bash -ex -c 'echo "Starting building postgres binari
     ; fi \
     \
     && if [ "$WITH_TOOLKIT" = true ]; then \
-      && curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh \
+      curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+      && . "$HOME/.cargo/env" \
+      && export PATH="/usr/local/pg-build/bin:${PATH}" \
       && cargo install --version "=0.10.2" --force cargo-pgrx \
       && cargo pgrx init --$pgrx_flag pg_config \
       && git clone https://github.com/timescale/timescaledb-toolkit && cd timescaledb-toolkit/extension \
+      && git checkout 1.18.0 \
       && cargo pgrx install --release && cargo run --manifest-path ../tools/post-install/Cargo.toml -- pg_config \
     ; fi \
     \
