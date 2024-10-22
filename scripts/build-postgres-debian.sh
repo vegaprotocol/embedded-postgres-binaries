@@ -57,6 +57,8 @@ $DOCKER_OPTS $IMG_NAME /bin/bash -ex -c 'echo "Starting building postgres binari
         libperl-dev \
         python3-dev \
         tcl-dev \
+        flex \
+        bison \
         \
     && wget -O patchelf.tar.gz "https://nixos.org/releases/patchelf/patchelf-0.9/patchelf-0.9.tar.gz" \
     && mkdir -p /usr/src/patchelf \
@@ -89,8 +91,8 @@ $DOCKER_OPTS $IMG_NAME /bin/bash -ex -c 'echo "Starting building postgres binari
         --with-python \
         --with-tcl \
         --without-readline \
-    && make -j$(nproc) world \
-    && make install-world \
+    && make -j$(nproc) world-bin \
+    && make install-world-bin \
     && make -C contrib install \
     \
     && if [ -n "$POSTGIS_VERSION" ]; then \
