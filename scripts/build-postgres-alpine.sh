@@ -6,17 +6,37 @@ CWD=$(dirname "$0")
 DOCKER_OPTS=
 POSTGIS_VERSION=
 LITE_OPT=false
+WITH_TOOLKIT=true
 
-while getopts "v:i:g:o:l" opt; do
+while getopts "v:i:g:o:lt" opt; do
     case $opt in
     v) PG_VERSION=$OPTARG ;;
     i) IMG_NAME=$OPTARG ;;
     g) POSTGIS_VERSION=$OPTARG ;;
     o) DOCKER_OPTS=$OPTARG ;;
     l) LITE_OPT=true ;;
+    t) WITH_TOOLKIT=false ;;
     \?) exit 1 ;;
     esac
 done
+
+case "${PG_VERSION}" in
+  *12*)
+    pgrx_flag="pg12"
+    ;;
+  *13*)
+    pgrx_flag="pg13"
+    ;;
+  *14*)
+    pgrx_flag="pg14"
+    ;;
+  *15*)
+    pgrx_flag="pg15"
+    ;;
+  *16*)
+    pgrx_flag="pg16"
+    ;;
+esac
 
 if [ -z "$PG_VERSION" ] ; then
   echo "Postgres version parameter is required!" && exit 1;
@@ -43,6 +63,8 @@ docker run -i --rm -v ${TRG_DIR}:/usr/local/pg-dist \
 -e PROJ_DATUMGRID_VERSION=1.8 \
 -e GEOS_VERSION=3.7.2 \
 -e GDAL_VERSION=2.4.1 \
+-e WITH_TOOLKIT=$WITH_TOOLKIT \
+-e pgrx_flag=$pgrx_flag \
 $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries" \
     && apk add --no-cache \
         coreutils \
@@ -149,6 +171,14 @@ $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries
             --with-gdalconfig=/usr/local/pg-build/bin/gdal-config \
         && make -j$(nproc) \
         && make install \
+    ; fi \
+    \
+    && if [ "$WITH_TOOLKIT" = true ]; then \
+      && curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh \
+      && cargo install --version "=0.10.2" --force cargo-pgrx \
+      && cargo pgrx init --$pgrx_flag pg_config \
+      && git clone https://github.com/timescale/timescaledb-toolkit && cd timescaledb-toolkit/extension \
+      && cargo pgrx install --release && cargo run --manifest-path ../tools/post-install/Cargo.toml -- pg_config \
     ; fi \
     \
     && cd /usr/local/pg-build \
