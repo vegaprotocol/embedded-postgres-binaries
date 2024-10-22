@@ -17,6 +17,7 @@ ext {
     qemuPathParam = project.findProperty('qemuPath') ?: ''
 
     pgMajorVersionParam = (pgVersionParam =~ /(\d+).+/).with { matches() ? it[0][1].toInteger() : null }
+    pgMinorVersionParam = (pgVersionParam =~ /\d+\.(\d+).*/).with { matches() ? it[0][1].toInteger() : null }
 }
 
 allprojects {
@@ -74,16 +75,17 @@ def repackedPlatforms = [
    ['name':'windows', 'arch':'amd64']
 ]
 
-def repackWindows = [
-    ['name':'windows', 'arch':'amd64']
-]
+if (pgMajorVersionParam > 14
+        || (pgMajorVersionParam == 14 && pgMinorVersionParam >= 1)) {
+    repackedPlatforms << ['name':'darwin', 'arch':'arm64v8']
+}
 
-def repackDarwin = [
-        ['name':'darwin', 'arch':'amd64'],
-]
-
-if (pgMajorVersionParam < 12) {
-    throw new GradleException("Postgres major versions must be 12 or above to support TimescaleDB")
+if (pgMajorVersionParam < 11) {
+    repackedPlatforms << ['name':'windows', 'arch':'i386']
+    if (pgVersionParam != '9.5.19') {
+        repackedPlatforms << ['name':'linux', 'arch':'i386']
+        repackedPlatforms << ['name':'linux', 'arch':'amd64']
+    }
 }
 
 def debianPlatforms = [
@@ -97,8 +99,8 @@ def alpinePlatforms = [
 ]
 
 def alpineVariants = [
-        ['name':'', 'opt':'', 'enabled': true]
-//         ['name':'lite', 'opt':'-l', 'enabled': pgMajorVersionParam >= 10]
+        ['name':'', 'opt':'', 'enabled': true],
+        ['name':'lite', 'opt':'-l', 'enabled': pgMajorVersionParam >= 10 && pgMajorVersionParam < 16]
 ]
 
 project(':repacked-platforms') {
@@ -119,7 +121,7 @@ project(':repacked-platforms') {
             task "${platform.arch}${platform.name.capitalize()}Jar"(group: "build (${platform.arch})", type: Jar) {
                 from tasks.getByName("build${platform.arch.capitalize()}${platform.name.capitalize()}Bundle")
                 include "postgres-${platform.name}-${normalizeArchName(platform.arch)}.txz"
-                appendix = "${platform.name}-${platform.arch}"
+                archiveAppendix = "${platform.name}-${platform.arch}"
             }
 
             task "test${platform.arch.capitalize()}${platform.name.capitalize()}Jar"(group: "build (${platform.arch})", type: LazyExec, dependsOn: [validateInputs, "${platform.arch}${platform.name.capitalize()}Jar"]) {
@@ -318,7 +320,7 @@ project(':debian-platforms') {
                 from tasks.getByName("build${platform.arch.capitalize()}DebianBundle")
                 include "postgres-linux-debian.txz"
                 rename "postgres-linux-debian.txz", "postgres-linux-${normalizeArchName(platform.arch)}.txz"
-                appendix = "linux-${platform.arch}"
+                archiveAppendix = "linux-${platform.arch}"
             }
 
             task "test${platform.arch.capitalize()}DebianJar"(group: "build (${platform.arch})", type: LazyExec, dependsOn: [validateInputs, prepareQemuExecutables, "${platform.arch}DebianJar"]) {
@@ -373,7 +375,7 @@ alpineVariants.each { variant ->
                     from tasks.getByName("build${platform.arch.capitalize()}Alpine${variant.name.capitalize()}Bundle")
                     include "postgres-linux-alpine_linux.txz"
                     rename "postgres-linux-alpine_linux.txz", "postgres-linux-${normalizeArchName(platform.arch)}-alpine_linux.txz"
-                    appendix = "linux-${platform.arch}-alpine${variant.name ? '-' + variant.name : ''}"
+                    archiveAppendix = "linux-${platform.arch}-alpine${variant.name ? '-' + variant.name : ''}"
                 }
 
                 task "test${platform.arch.capitalize()}Alpine${variant.name.capitalize()}Jar"(group: "build (${platform.arch})", type: LazyExec, dependsOn: [validateInputs, prepareQemuExecutables, "${platform.arch}Alpine${variant.name.capitalize()}Jar"]) {
@@ -438,7 +440,7 @@ project(':custom-debian-platform') {
             from buildCustomDebianBundle
             include "postgres-linux-debian.txz"
             rename "postgres-linux-debian.txz", "postgres-linux-${normalizeArchName(archName)}.txz"
-            appendix = "linux-${archName}"
+            archiveAppendix = "linux-${archName}"
         }
 
         task testCustomDebianJar(group: 'build (custom)', type: LazyExec, dependsOn: [validateInputs, prepareQemuExecutables, customDebianJar]) {
@@ -497,7 +499,7 @@ alpineVariants.each { variant ->
 
                 include "postgres-linux-alpine_linux.txz"
                 rename "postgres-linux-alpine_linux.txz", "postgres-linux-${normalizeArchName(archName)}-alpine_linux.txz"
-                appendix = "linux-${archName}-alpine${variant.name ? '-' + variant.name : ''}"
+                archiveAppendix = "linux-${archName}-alpine${variant.name ? '-' + variant.name : ''}"
             }
 
             task "testCustomAlpine${variant.name.capitalize()}Jar"(group: 'build (custom)', type: LazyExec, dependsOn: [validateInputs, prepareQemuExecutables, "customAlpine${variant.name.capitalize()}Jar"]) {
@@ -526,12 +528,12 @@ alpineVariants.each { variant ->
 subprojects {
     task sourcesJar(type: Jar, dependsOn: classes) {
         from sourceSets.main.allSource
-        classifier = 'sources'
+        archiveClassifier = 'sources'
     }
 
     task javadocJar(type: Jar, dependsOn: javadoc) {
         from javadoc.destinationDir
-        classifier = 'javadoc'
+        archiveClassifier = 'javadoc'
     }
 
     publishing {
@@ -610,6 +612,11 @@ allprojects {
     signing {
         required { gradle.taskGraph.hasTask("publish") }
 
+        def signingKey = findProperty("signingKey")
+        def signingKeyId = findProperty("signingKeyId")
+        def signingPassword = findProperty("signingPassword")
+        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+
         publishing.publications.all { publication ->
             sign publication
         }
@@ -686,12 +693,12 @@ static def defaultDebianImage(archName, useEmulation) {
     def system = OperatingSystem.current()
 
     if (archName == system.getArch()) {
-        return 'ubuntu:20.04'
+        return 'ubuntu:18.04'
     } else if (system.isMacOsX() || useEmulation) {
-        return "$archName/ubuntu:20.04"
+        return "$archName/ubuntu:18.04"
     } else if (system.isLinux()) {
         def archMappings = ['arm32v6':'armel', 'arm32v7':'armhf', 'arm64v8':'arm64', 'ppc64le':'ppc64el']
-        return "multiarch/ubuntu-core:${archMappings[archName] ?: archName}-focal"
+        return "multiarch/ubuntu-core:${archMappings[archName] ?: archName}-bionic"
     } else {
         throw new GradleException("Cross-building is not supported on the current platform: $system")
     }
