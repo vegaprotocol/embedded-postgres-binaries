@@ -3,8 +3,9 @@ set -ex
 
 DOCKER_OPTS=
 POSTGIS_VERSION=
+WITH_TOOLKIT=true
 
-while getopts "j:z:i:v:g:o:" opt; do
+while getopts "j:z:i:v:g:o:l" opt; do
     case $opt in
     j) JAR_FILE=$OPTARG ;;
     z) ZIP_FILE=$OPTARG ;;
@@ -12,6 +13,7 @@ while getopts "j:z:i:v:g:o:" opt; do
     v) PG_VERSION=$OPTARG ;;
     g) POSTGIS_VERSION=$OPTARG ;;
     o) DOCKER_OPTS=$OPTARG ;;
+    l) WITH_TOOLKIT=false ;;
     \?) exit 1 ;;
     esac
 done
@@ -36,6 +38,7 @@ docker run -i --rm -v ${LIB_DIR}:/usr/local/pg-lib:ro \
 -e ZIP_FILE=$ZIP_FILE \
 -e PG_VERSION=$PG_VERSION \
 -e POSTGIS_VERSION=$POSTGIS_VERSION \
+-e WITH_TOOLKIT=$WITH_TOOLKIT \
 $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries" \
     && apk add --no-cache \
         postgresql-client \
@@ -61,5 +64,7 @@ $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries
     && echo $(psql -qAtX -h localhost -p 65432 -U postgres -d postgres -c '\''CREATE EXTENSION "uuid-ossp"; SELECT uuid_generate_v4();'\'') | grep -E '\''^[^-]{8}-[^-]{4}-[^-]{4}-[^-]{4}-[^-]{12}$'\'' \
     \
     && if echo "$PG_VERSION" | grep -qvE '\''^(10|9)\.'\'' ; then test $(psql -qAtX -h localhost -p 65432 -U postgres -d postgres -c '\''SET jit_above_cost = 10; SELECT SUM(relpages) FROM pg_class;'\'') -gt 0 ; fi \
+    \
+    && if [ "$WITH_TOOLKIT" = true ]; then test $(psql -qAtX -h localhost -p 65432 -U postgres -d postgres -c "CREATE EXTENSION timescaledb_toolkit;") = $POSTGIS_VERSION ; fi \
     \
     && if [ -n "$POSTGIS_VERSION" ]; then test $(psql -qAtX -h localhost -p 65432 -U postgres -d postgres -c "CREATE EXTENSION postgis; SELECT PostGIS_Lib_Version();") = $POSTGIS_VERSION ; fi'
