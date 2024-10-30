@@ -104,6 +104,7 @@ $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries
         lld \
         libressl-dev \
         libffi-dev \
+        tree \
         \
     && if [ "$E2FS_ENABLED" = false ]; then \
         wget -O uuid.tar.gz "https://www.mirrorservice.org/sites/ftp.ossp.org/pkg/lib/uuid/uuid-1.6.2.tar.gz" \
