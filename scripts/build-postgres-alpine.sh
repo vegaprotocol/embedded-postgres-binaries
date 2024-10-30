@@ -204,14 +204,12 @@ $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries
     \
     && cd /usr/local/pg-build \
     && cp /lib/libuuid.so.1 /lib/libz.so.1 /usr/lib/libxml2.so.2 /usr/lib/libxslt.so.1 ./lib \
-    && tree /lib | grep libssl \
-    && tree /lib | grep libcrypto \
-    && if [ -f "/lib/libssl.so.1.0.0" ]; then \
-      cp /lib/libssl.so.1.0.0 ./lib \
+    && if [ -f "/lib/libssl.so.1.1" ]; then \
+      cp /lib/libssl.so.1.1 ./lib \
     ; fi \
     \
-    && if [ -f "/lib/libcrypto.so.1.0.0" ]; then \
-      cp /lib/libcrypto.so.1.0.0 ./lib \
+    && if [ -f "/lib/libcrypto.so.1.1" ]; then \
+      cp /lib/libcrypto.so.1.1 ./lib \
     ; fi \
     \
     && if [ "$ICU_ENABLED" = true ]; then cp --no-dereference /usr/lib/libicudata.so* /usr/lib/libicuuc.so* /usr/lib/libicui18n.so* /usr/lib/libstdc++.so* /usr/lib/libgcc_s.so* ./lib; fi \
