@@ -184,7 +184,7 @@ $DOCKER_OPTS $IMG_NAME /bin/bash -ex -c 'echo "Starting building postgres binari
       && cargo pgrx init --$pgrx_flag pg_config \
       && git clone https://github.com/timescale/timescaledb-toolkit && cd timescaledb-toolkit/extension \
       && git checkout 1.18.0 \
-      && cargo pgrx install --release && cargo run --manifest-path ../tools/post-install/Cargo.toml -- pg_config \
+      && RUSTFLAGS="-C target-feature=-crt-static" cargo pgrx install --release && cargo run --manifest-path ../tools/post-install/Cargo.toml -- pg_config \
     ; fi \
     \
     && cd /usr/local/pg-build \

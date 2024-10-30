@@ -7,7 +7,7 @@
 # not really understanding it. Just run it direcly and it should make 
 # the .zip file for manual upload to github releases.
 
-PG_VERSION=14.1
+PG_VERSION=16.4
 TIMESCALE_VERSION=2.6.0
 
 ARCH=$(uname -m)
@@ -54,6 +54,17 @@ find $PREFIX/lib -type f -name "*.so"  | \
 
 cd $PREFIX
 
+# install cargo, compile the toolkit
+curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+. "$HOME/.cargo/env"
+export PATH="${PREFIX}/bin:${PATH}"
+rustup target add x86_64-unknown-linux-gnu
+cargo install --version "=0.10.2" --force cargo-pgrx
+cargo pgrx init --pg16 pg_config
+git clone https://github.com/timescale/timescaledb-toolkit && cd timescaledb-toolkit/extension
+git checkout 1.18.0
+RUSTFLAGS="-C target-feature=-crt-static" cargo pgrx install --release
+cargo run --manifest-path ../tools/post-install/Cargo.toml -- pg_config
 # Tar it up
 tar -cJvf ../embedded-postgres-binaries-darwin-${ARCH}-${PG_VERSION}.0.txz \
   share/* \

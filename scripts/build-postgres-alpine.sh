@@ -95,14 +95,10 @@ $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries
         readline-dev \
         libxml2-utils \
         ccache \
-        zlib-dev \
-        libxslt-dev \
         g++ \
         libgcrypt \
-        openssl-dev \
         musl-dev \
         build-base \
-        libressl-dev \
         musl \
         musl-dev \
         \
@@ -194,12 +190,12 @@ $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries
       curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
       && . "$HOME/.cargo/env" \
       && export PATH="/usr/local/pg-build/bin:${PATH}" \
-      && rustup target add x86_64-unknown-linux-gnu \
+      && rustup target add x86_64-unknown-linux-musl \
       && cargo install --version "=0.10.2" --force cargo-pgrx \
       && cargo pgrx init --$pgrx_flag pg_config \
       && git clone https://github.com/timescale/timescaledb-toolkit && cd timescaledb-toolkit/extension \
       && git checkout 1.18.0 \
-      && RUSTFLAGS="-C target-feature=-crt-static" cargo pgrx install --release && cargo run --manifest-path ../tools/post-install/Cargo.toml -- pg_config \
+      && cargo pgrx install --release && cargo run --manifest-path ../tools/post-install/Cargo.toml -- pg_config \
     ; fi \
     \
     && cd /usr/local/pg-build \
