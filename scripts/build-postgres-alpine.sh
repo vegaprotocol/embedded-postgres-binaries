@@ -203,8 +203,16 @@ $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries
     \
     && cd /usr/local/pg-build \
     && cp /lib/libuuid.so.1 /lib/libz.so.1 /usr/lib/libxml2.so.2 /usr/lib/libxslt.so.1 ./lib \
-    && [ -f "/lib/libssl.so.1.0.0" ] && cp /lib/libssl.so.1.0.0 ./lib \
-    && [ -f "/lib/libcrypto.so.1.0.0" ] && cp /lib/libcrypto.so.1.0.0 ./lib \
+    && tree /lib | grep libssl \
+    && tree /lib | grep libcrypto \
+    && if [ -f "/lib/libssl.so.1.0.0" ]; then \
+      cp /lib/libssl.so.1.0.0 ./lib \
+    ; fi \
+    \
+    && if [ -f "/lib/libcrypto.so.1.0.0" ]; then \
+      cp /lib/libcrypto.so.1.0.0 ./lib \
+    ; fi \
+    \
     && if [ "$ICU_ENABLED" = true ]; then cp --no-dereference /usr/lib/libicudata.so* /usr/lib/libicuuc.so* /usr/lib/libicui18n.so* /usr/lib/libstdc++.so* /usr/lib/libgcc_s.so* ./lib; fi \
     && if [ -n "$POSTGIS_VERSION" ]; then cp --no-dereference /usr/lib/libjson-c.so* /usr/lib/libsqlite3.so* ./lib ; fi \
     && find ./bin -type f \( -name "initdb" -o -name "pg_ctl" -o -name "postgres" \) -print0 | xargs -0 -n1 chrpath -r "\$ORIGIN/../lib" \
