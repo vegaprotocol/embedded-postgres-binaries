@@ -101,6 +101,9 @@ $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries
         build-base \
         musl \
         musl-dev \
+        lld \
+        libressl-dev \
+        libffi-dev \
         \
     && if [ "$E2FS_ENABLED" = false ]; then \
         wget -O uuid.tar.gz "https://www.mirrorservice.org/sites/ftp.ossp.org/pkg/lib/uuid/uuid-1.6.2.tar.gz" \
@@ -195,7 +198,7 @@ $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries
       && cargo pgrx init --$pgrx_flag pg_config \
       && git clone https://github.com/timescale/timescaledb-toolkit && cd timescaledb-toolkit/extension \
       && git checkout 1.18.0 \
-      && cargo pgrx install --release && cargo run --manifest-path ../tools/post-install/Cargo.toml -- pg_config \
+      && RUSTFLAGS="-C target-feature=-crt-static" cargo pgrx install --release && cargo run --manifest-path ../tools/post-install/Cargo.toml -- pg_config \
     ; fi \
     \
     && cd /usr/local/pg-build \
