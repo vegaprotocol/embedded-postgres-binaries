@@ -95,16 +95,16 @@ $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries
         readline-dev \
         libxml2-utils \
         ccache \
-        zlib-dev \
-        libxslt-dev \
         g++ \
         libgcrypt \
-        openssl-dev \
         musl-dev \
         build-base \
-        libressl-dev \
         musl \
         musl-dev \
+        lld \
+        libressl-dev \
+        libffi-dev \
+        tree \
         \
     && if [ "$E2FS_ENABLED" = false ]; then \
         wget -O uuid.tar.gz "https://www.mirrorservice.org/sites/ftp.ossp.org/pkg/lib/uuid/uuid-1.6.2.tar.gz" \
@@ -194,16 +194,24 @@ $DOCKER_OPTS $IMG_NAME /bin/sh -ex -c 'echo "Starting building postgres binaries
       curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
       && . "$HOME/.cargo/env" \
       && export PATH="/usr/local/pg-build/bin:${PATH}" \
-      && rustup target add x86_64-unknown-linux-gnu \
-      && cargo install --version "=0.10.2" --force cargo-pgrx \
-      && cargo pgrx init --$pgrx_flag pg_config \
+      && rustup target add x86_64-unknown-linux-musl \
+      && RUSTFLAGS="-C target-feature=-crt-static" cargo install --version "=0.10.2" --force cargo-pgrx \
+      && RUSTFLAGS="-C target-feature=-crt-static" cargo pgrx init --$pgrx_flag pg_config \
       && git clone https://github.com/timescale/timescaledb-toolkit && cd timescaledb-toolkit/extension \
       && git checkout 1.18.0 \
-      && RUSTFLAGS="-C target-feature=-crt-static" cargo pgrx install --release && cargo run --manifest-path ../tools/post-install/Cargo.toml -- pg_config \
+      && RUSTFLAGS="-C target-feature=-crt-static" cargo pgrx install --release && RUSTFLAGS="-C target-feature=-crt-static" cargo run --manifest-path ../tools/post-install/Cargo.toml -- pg_config \
     ; fi \
     \
     && cd /usr/local/pg-build \
-    && cp /lib/libuuid.so.1 /lib/libz.so.1 /lib/libssl.so.1.0.0 /lib/libcrypto.so.1.0.0 /usr/lib/libxml2.so.2 /usr/lib/libxslt.so.1 ./lib \
+    && cp /lib/libuuid.so.1 /lib/libz.so.1 /usr/lib/libxml2.so.2 /usr/lib/libxslt.so.1 ./lib \
+    && if [ -f "/lib/libssl.so.1.1" ]; then \
+      cp /lib/libssl.so.1.1 ./lib \
+    ; fi \
+    \
+    && if [ -f "/lib/libcrypto.so.1.1" ]; then \
+      cp /lib/libcrypto.so.1.1 ./lib \
+    ; fi \
+    \
     && if [ "$ICU_ENABLED" = true ]; then cp --no-dereference /usr/lib/libicudata.so* /usr/lib/libicuuc.so* /usr/lib/libicui18n.so* /usr/lib/libstdc++.so* /usr/lib/libgcc_s.so* ./lib; fi \
     && if [ -n "$POSTGIS_VERSION" ]; then cp --no-dereference /usr/lib/libjson-c.so* /usr/lib/libsqlite3.so* ./lib ; fi \
     && find ./bin -type f \( -name "initdb" -o -name "pg_ctl" -o -name "postgres" \) -print0 | xargs -0 -n1 chrpath -r "\$ORIGIN/../lib" \
