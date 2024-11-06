@@ -1,5 +1,8 @@
 name: Release
 on:
+  push:
+    tags:
+      - vega-*
   milestone:
     types: [closed]
 jobs:
@@ -18,7 +21,7 @@ jobs:
           java-version: 15
       - name: Set environment variables
         env:
-          MILESTONE_VERSION: ${{ github.event.milestone.title }}
+          MILESTONE_VERSION: 16.4
         run: |
           echo "RELEASE_VERSION=$MILESTONE_VERSION" >> $GITHUB_ENV
           echo "POSTGRES_VERSION=${MILESTONE_VERSION%.*}" >> $GITHUB_ENV
@@ -46,7 +49,7 @@ jobs:
           java-version: 15
       - name: Set environment variables
         env:
-          MILESTONE_VERSION: ${{ github.event.milestone.title }}
+          MILESTONE_VERSION: 16.4
         run: |
           echo "RELEASE_VERSION=$MILESTONE_VERSION" >> $GITHUB_ENV
           echo "POSTGRES_VERSION=${MILESTONE_VERSION%.*}" >> $GITHUB_ENV
@@ -74,7 +77,7 @@ jobs:
           java-version: 15
       - name: Set environment variables
         env:
-          MILESTONE_VERSION: ${{ github.event.milestone.title }}
+          MILESTONE_VERSION: 16.4
         run: |
           echo "RELEASE_VERSION=$MILESTONE_VERSION" >> $GITHUB_ENV
           echo "POSTGRES_VERSION=${MILESTONE_VERSION%.*}" >> $GITHUB_ENV
@@ -102,7 +105,7 @@ jobs:
           java-version: 15
       - name: Set environment variables
         env:
-          MILESTONE_VERSION: ${{ github.event.milestone.title }}
+          MILESTONE_VERSION: 16.4
         run: |
           echo "RELEASE_VERSION=$MILESTONE_VERSION" >> $GITHUB_ENV
           echo "POSTGRES_VERSION=${MILESTONE_VERSION%.*}" >> $GITHUB_ENV
@@ -130,7 +133,7 @@ jobs:
           java-version: 15
       - name: Set environment variables
         env:
-          MILESTONE_VERSION: ${{ github.event.milestone.title }}
+          MILESTONE_VERSION: 16.4
         run: |
           echo "RELEASE_VERSION=$MILESTONE_VERSION" >> $GITHUB_ENV
           echo "POSTGRES_VERSION=${MILESTONE_VERSION%.*}" >> $GITHUB_ENV
@@ -158,7 +161,7 @@ jobs:
           java-version: 15
       - name: Set environment variables
         env:
-          MILESTONE_VERSION: ${{ github.event.milestone.title }}
+          MILESTONE_VERSION: 16.4
         run: |
           echo "RELEASE_VERSION=$MILESTONE_VERSION" >> $GITHUB_ENV
           echo "POSTGRES_VERSION=${MILESTONE_VERSION%.*}" >> $GITHUB_ENV
@@ -187,7 +190,7 @@ jobs:
           java-version: 15
       - name: Set environment variables
         env:
-          MILESTONE_VERSION: ${{ github.event.milestone.title }}
+          MILESTONE_VERSION: 16.4
         run: |
           echo "RELEASE_VERSION=$MILESTONE_VERSION" >> $GITHUB_ENV
           echo "POSTGRES_VERSION=${MILESTONE_VERSION%.*}" >> $GITHUB_ENV
@@ -216,7 +219,7 @@ jobs:
           java-version: 15
       - name: Set environment variables
         env:
-          MILESTONE_VERSION: ${{ github.event.milestone.title }}
+          MILESTONE_VERSION: 16.4
         run: |
           echo "RELEASE_VERSION=$MILESTONE_VERSION" >> $GITHUB_ENV
           echo "POSTGRES_VERSION=${MILESTONE_VERSION%.*}" >> $GITHUB_ENV
@@ -245,7 +248,7 @@ jobs:
           java-version: 15
       - name: Set environment variables
         env:
-          MILESTONE_VERSION: ${{ github.event.milestone.title }}
+          MILESTONE_VERSION: 16.4
         run: |
           echo "RELEASE_VERSION=$MILESTONE_VERSION" >> $GITHUB_ENV
           echo "POSTGRES_VERSION=${MILESTONE_VERSION%.*}" >> $GITHUB_ENV
@@ -279,7 +282,7 @@ jobs:
           java-version: 15
       - name: Set environment variables
         env:
-          MILESTONE_VERSION: ${{ github.event.milestone.title }}
+          MILESTONE_VERSION: 16.4
         run: |
           echo "RELEASE_VERSION=$MILESTONE_VERSION" >> $GITHUB_ENV
           echo "POSTGRES_VERSION=${MILESTONE_VERSION%.*}" >> $GITHUB_ENV
